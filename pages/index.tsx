@@ -323,8 +323,8 @@ const TodoPage = () => {
 					theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-black"
 				}`}
 			>
-				<header className="p-4 mb-4 rounded flex justify-between items-center">
-					<h1 className="text-4xl">Todo App</h1>
+				<header className="p-2 mb-2 rounded flex justify-between items-center">
+					<h1 className="text-4xl font-bold">Todo App</h1>
 					{/* <button
 						onClick={toggleTheme}
 						className="bg-blue-500 text-white px-4 py-2 rounded"
