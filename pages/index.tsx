@@ -198,9 +198,7 @@ const TodoPage = () => {
 	async function getData() {
 		const response = await fetch(`${process.env.API_PATH}/expense`);
 		const responseData = await response.json();
-		console.log("responseData", responseData);
 		if (responseData.success) {
-			console.log(responseData.data);
 			setData(responseData.data);
 		} else {
 			setData([]);
@@ -210,7 +208,6 @@ const TodoPage = () => {
 	async function getEditData(id: String) {
 		const response = await fetch(`${process.env.API_PATH}/expense/${id}`);
 		const responseData = await response.json();
-		console.log("single data", responseData.data);
 		if (responseData.success) {
 			setSingleData(responseData.data);
 			setOpen(true);
@@ -220,7 +217,7 @@ const TodoPage = () => {
 	}
 
 	async function handleDeleteData(id: String) {
-		const response = await fetch(`${process.env.API_PATH}/expense/${id}`, {
+		const response = await fetch(`${process.env.API_PATH}/expense/delete/${id}`, {
 			method: "DELETE",
 		});
 		const responseData = await response.json();
@@ -243,7 +240,7 @@ const TodoPage = () => {
 				variant: "error",
 			});
 		} else if (singleData?._id) {
-			const response = await fetch(`${process.env.API_PATH}/expense/${singleData._id}`, {
+			const response = await fetch(`${process.env.API_PATH}/expense/update/${singleData._id}`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
