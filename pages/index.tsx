@@ -34,18 +34,6 @@ import { TbEdit } from "react-icons/tb/index";
 import { MdContentCopy } from "react-icons/md/index";
 import { MdDeleteOutline } from "react-icons/md/index";
 
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
 export type Payment = {
 	_id?: string;
 	amount: number;
@@ -67,11 +55,7 @@ const TodoPage = () => {
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [rowSelection, setRowSelection] = React.useState({});
-	const [singleData, setSingleData] = useState({
-		title: "",
-		amount: 0,
-		category: "",
-	});
+	const [singleData, setSingleData] = useState<{ _id?: string; title?: string; amount?: number; category?: string }>({});
 	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 	const [open, setOpen] = useState(false);
 
@@ -196,100 +180,109 @@ const TodoPage = () => {
 	};
 
 	async function getData() {
-		const response = await fetch(`${process.env.API_PATH}/expense`);
-		const responseData = await response.json();
-		console.log("responseData", responseData);
-		if (responseData.success) {
-			console.log(responseData.data);
-			setData(responseData.data);
-		} else {
-			setData([]);
-		}
+		await fetch(`${process.env.API_PATH}/expense`)
+			.then((response) => response.json())
+			.then((response) => {
+				response.success && setData(response.data);
+			})
+			.catch((error) => console.error(error));
 	}
 
 	async function getEditData(id: String) {
-		const response = await fetch(`${process.env.API_PATH}/expense/${id}`);
-		const responseData = await response.json();
-		console.log("single data", responseData.data);
-		if (responseData.success) {
-			setSingleData(responseData.data);
-			setOpen(true);
-		} else {
-			return enqueueSnackbar(responseData.message, { variant: "error" });
-		}
+		await fetch(`${process.env.API_PATH}/expense/${id}`)
+			.then((response) => response.json())
+			.then((response) => {
+				if (response.success) {
+					setSingleData(response.data);
+					setOpen(true);
+				} else {
+					return enqueueSnackbar(response.message, { variant: "error" });
+				}
+			})
+			.catch((error) => console.error(error));
 	}
 
 	async function handleDeleteData(id: String) {
-		const response = await fetch(`${process.env.API_PATH}/expense/${id}`, {
+		await fetch(`${process.env.API_PATH}/expense/${id}`, {
 			method: "DELETE",
-		});
-		const responseData = await response.json();
-		if (responseData.success) {
-			await getData();
-			return enqueueSnackbar("Expense deleted successfully", {
-				variant: "success",
-			});
-		} else {
-			return enqueueSnackbar(responseData.message, { variant: "error" });
-		}
+		})
+			.then((response) => response.json())
+			.then(async (response) => {
+				if (response.success) {
+					await getData();
+					return enqueueSnackbar("Expense deleted successfully", {
+						variant: "success",
+					});
+				} else {
+					return enqueueSnackbar(response.message, { variant: "error" });
+				}
+			})
+			.catch((error) => console.error(error));
 	}
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
 
 		// validate data
-		if (!singleData.title || !singleData.amount || !singleData.category) {
-			return enqueueSnackbar("Please fill all the fields", {
-				variant: "error",
-			});
-		} else if (singleData?._id) {
-			const response = await fetch(`${process.env.API_PATH}/expense/${singleData._id}`, {
+		// if (!singleData.title || !singleData.amount || !singleData.category) {
+		// 	return enqueueSnackbar("Please fill all the fields", {
+		// 		variant: "error",
+		// 	});
+		// } else 
+		if (singleData?._id) {
+			await fetch(`${process.env.API_PATH}/expense/${singleData._id}`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(singleData),
-			});
-			const responseData = await response.json();
-			if (responseData.success) {
-				setSingleData({
-					title: "",
-					amount: 0,
-					category: "",
-				});
-				closeSnackbar();
-				setOpen(false);
-				await getData();
-				return enqueueSnackbar("Expense updated successfully", {
-					variant: "success",
-				});
-			} else {
-				return enqueueSnackbar(responseData.message, { variant: "error" });
-			}
+			})
+				.then((response) => response.json())
+				.then(async (response) => {
+					if (response.success) {
+						setSingleData({
+							title: "",
+							amount: 0,
+							category: "",
+						});
+						closeSnackbar();
+						setOpen(false);
+						await getData();
+						return enqueueSnackbar("Expense updated successfully", {
+							variant: "success",
+						});
+					} else {
+						return enqueueSnackbar(response.message, { variant: "error" });
+					}
+				})
+				.catch((error) => console.error(error));
 		} else {
-			const response = await fetch(`${process.env.API_PATH}/expense/create`, {
+			await fetch(`${process.env.API_PATH}/expense/create`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(singleData),
-			});
-			const responseData = await response.json();
-			if (responseData.success) {
-				setSingleData({
-					title: "",
-					amount: 0,
-					category: "",
-				});
-				closeSnackbar();
-				setOpen(false);
-				await getData();
-				return enqueueSnackbar("Expense created successfully", {
-					variant: "success",
-				});
-			} else {
-				return enqueueSnackbar(responseData.message, { variant: "error" });
-			}
+			})
+				.then((response) => response.json())
+				.then(async (response) => {
+					if (response.success) {
+						setSingleData({
+							title: "",
+							amount: 0,
+							category: "",
+						});
+						closeSnackbar();
+						setOpen(false);
+						await getData();
+						return enqueueSnackbar("Expense created successfully", {
+							variant: "success",
+						});
+					} else {
+						return enqueueSnackbar(response.message, { variant: "error" });
+					}
+				})
+				.catch((error) => console.error(error));
 		}
 	}
 
