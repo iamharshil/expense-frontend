@@ -157,24 +157,6 @@ const TodoPage = () => {
 		},
 	});
 
-	const addTodo = () => {
-		setTodos([...todos, { text: todo, done: false }]);
-		setTodo("");
-	};
-
-	// Remove the type wrapper from the index parameter in removeTodo and toggleDone functions
-	const removeTodo = (index: number) => {
-		const newTodos: Todo[] = [...todos];
-		newTodos.splice(index, 1);
-		setTodos(newTodos);
-	};
-
-	const toggleDone = (index: number) => {
-		const newTodos = [...todos];
-		newTodos[index].done = !newTodos[index].done;
-		setTodos(newTodos);
-	};
-
 	const toggleTheme = () => {
 		setTheme(theme === "dark" ? "light" : "dark");
 	};
@@ -224,11 +206,11 @@ const TodoPage = () => {
 		e.preventDefault();
 
 		// validate data
-		// if (!singleData.title || !singleData.amount || !singleData.category) {
-		// 	return enqueueSnackbar("Please fill all the fields", {
-		// 		variant: "error",
-		// 	});
-		// } else 
+		if (!singleData.title || !singleData.amount || !singleData.category) {
+			return enqueueSnackbar("Please fill all the fields", {
+				variant: "error",
+			});
+		} 
 		if (singleData?._id) {
 			await fetch(`${process.env.API_PATH}/expense/${singleData._id}`, {
 				method: "PUT",
