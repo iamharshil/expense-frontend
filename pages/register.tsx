@@ -1,3 +1,5 @@
+import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 import React from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
@@ -9,6 +11,9 @@ export default function RegisterPage() {
 		password: "",
 		repeat_password: "",
 	});
+	const router = useRouter();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		// username email
@@ -16,13 +21,17 @@ export default function RegisterPage() {
 		await fetch(`${process.env.API_PATH}/auth/register`, {
 			method: "POST",
 			body: JSON.stringify(data),
-			// headers: {
-			// 	"Content-Type": "application/json",
-			// },
+			headers: {
+				"Content-Type": "application/json",
+			},
 		})
 			.then((res) => res.json())
 			.then((res) => {
-				console.log(res);
+				if (res.success) {
+					return router.push("/login");
+				} else {
+					return enqueueSnackbar(res.message, { variant: "error" });
+				}
 			});
 	}
 	return (

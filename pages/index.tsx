@@ -41,6 +41,22 @@ export type Payment = {
 	category: string;
 };
 
+import { GetServerSideProps } from 'next';
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+	const auth_token = req.cookies?.auth_token;
+	if (!auth_token) {
+		return {
+			redirect: {
+				destination: "/login",
+				permanent: false,
+			},
+		};
+	}
+	// call api and check if token is valid
+	return { props: {} };
+};
+
 const TodoPage = () => {
 	type Todo = {
 		text: string;
@@ -48,8 +64,6 @@ const TodoPage = () => {
 	};
 
 	const [data, setData] = useState([]);
-	const [todos, setTodos] = useState<Todo[]>([]);
-	const [todo, setTodo] = useState<string>("");
 	const [theme, setTheme] = useState<string>("light");
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -210,7 +224,7 @@ const TodoPage = () => {
 			return enqueueSnackbar("Please fill all the fields", {
 				variant: "error",
 			});
-		} 
+		}
 		if (singleData?._id) {
 			await fetch(`${process.env.API_PATH}/expense/${singleData._id}`, {
 				method: "PUT",
