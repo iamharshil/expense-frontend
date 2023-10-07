@@ -4,16 +4,11 @@ const nextConfig = {
 	env: {
 		API_PATH: process.env.API_PATH,
 	},
-	async headers() {
+	async rewrites() {
 		return [
 			{
 				source: "/api/:path*",
-				headers: [
-					{
-						key: "Content-Type",
-						value: "application/json",
-					},
-				],
+				destination: "http://localhost:4000/api/:path*",
 			},
 		];
 	},
